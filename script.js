@@ -151,9 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateDisplay();
 });
 
-body.cycle-rest() {
-    background-color: #6699ff;
-}
+
 window.onload = function () {
     console.log("JavaScript がロードされました");
 
