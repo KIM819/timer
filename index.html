@@ -1,51 +1,74 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>タイマー</title>
-  <link rel="stylesheet" href="./style.css">
-
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<!-- index.html -->
-<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ワークアウトタイマー</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>ワークアウトタイマー</h1>
-        <div id="time-display">00:00</div>
-        <div id="round-display">ラウンド: 1/3</div>
-        <div id="cycle-display">サイクル: 1/2</div>
-        <button id="start-button">スタート</button>
-        <button id="stop-button">ストップ</button>
-        <button id="reset-button">リセット</button>
-        <button id="settings-button">設定</button>
+        <div class="left-panel">
+        
+
+            <div class="countdown">
+                <div class="main-timer">
+                    <h2 id="current-phase">ワークアウト</h2>
+                    <p id="timer-display">00:00</p>
+                </div>
+             
+            </div>
+
+            <div class="status">
+                  <div class="status-item">
+        <p id="total-countdown">全体残り時間: 00:00</p>
     </div>
-    
-    <div id="overlay" class="overlay">
-        <div class="settings">
-            <h2>設定</h2>
-            <label>ワークアウト時間（分:秒） <input type="text" id="workout-time" value="01:00"></label>
-            <label>休憩時間（分:秒） <input type="text" id="rest-time" value="00:30"></label>
-            <label>サイクル間休憩時間（分:秒） <input type="text" id="cycle-rest-time" value="01:00"></label>
-            <label>1サイクルあたりのラウンド数 <input type="number" id="rounds-per-cycle" value="3"></label>
-            <label>サイクル数 <input type="number" id="cycles" value="2"></label>
-            <button id="save-settings">保存</button>
+              <div class="status-item">
+                <p>残りラウンド: <span id="remaining-rounds">0</span></p>
+                <p>残りサイクル: <span id="remaining-cycles">0</span></p>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="controls">
+                <button id="start-btn">スタート</button>
+                <button id="stop-btn">ストップ</button>
+                <button id="reset-btn">リセット</button>
+                <button id="settings-btn">設定</button>
+            </div>
         </div>
     </div>
-    
-    <script src="script.js"></script>
-</body>
-</html>
-<!-- partial -->
-  <script  src="./script.js"></script>
 
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h2>設定</h2>
+            <div class="settings-group">
+                <label>ワークアウト時間 (mm:ss):</label>
+                <input type="text" id="workout-time" value="00:30">
+            </div>
+            <div class="settings-group">
+                <label>休憩時間 (mm:ss):</label>
+                <input type="text" id="rest-time" value="00:10">
+            </div>
+            <div class="settings-group">
+                <label>サイクル間休憩時間 (mm:ss):</label>
+                <input type="text" id="cycle-rest-time" value="01:00">
+            </div>
+            <div class="settings-group">
+                <label>ラウンド数:</label>
+                <input type="number" id="rounds" value="5">
+            </div>
+            <div class="settings-group">
+                <label>サイクル数:</label>
+                <input type="number" id="cycles" value="3">
+            </div>
+            <div class="settings-buttons">
+                <button id="save-settings">保存</button>
+                <button id="close-settings">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
