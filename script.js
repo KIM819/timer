@@ -1,184 +1,155 @@
-/* 全体のレイアウト */
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f4f4f4;
-    overflow: hidden; /* スクロール禁止 */
-}
+document.addEventListener("DOMContentLoaded", function () {
+    let workoutTime = 30; // 初期ワークアウト時間（秒）
+    let restTime = 10; // 初期休憩時間（秒）
+    let cycleRestTime = 60; // 初期サイクル間休憩時間（秒）
+    let totalRounds = 5; // 1サイクルのラウンド数
+    let totalCycles = 3; // 総サイクル数
 
-.container {
-    display: flex;
-    flex-direction: row;
-    width: 95%;
-    max-width: 1000px;
-    height: 95vh;
-    background: white;
-    padding: 5px; /* 余白を縮小 */
-    border-radius: 10px;
-    box-shadow: 2px 2px 10px #aaa;
-    justify-content: space-between;
-    align-items: center;
-}
+    let remainingRounds = totalRounds;
+    let remainingCycles = totalCycles;
+    let isRunning = false;
+    let timer;
+    let totalRemainingTime = (workoutTime * totalRounds + restTime * (totalRounds - 1)) * totalCycles + (totalCycles - 1) * cycleRestTime;
 
-/* 左パネル（タイマー表示） */
-.left-panel {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
+    const timerDisplay = document.querySelector("#timer-display");
+    const totalCountdown = document.querySelector("#total-countdown");
+    const phaseTitle = document.querySelector("#current-phase");
+    const remainingRoundsDisplay = document.querySelector("#remaining-rounds");
+    const remainingCyclesDisplay = document.querySelector("#remaining-cycles");
 
-/* 右パネル（ボタン） */
-.right-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
+    const startButton = document.querySelector("#start-btn");
+    const stopButton = document.querySelector("#stop-btn");
+    const resetButton = document.querySelector("#reset-btn");
+    const settingsButton = document.querySelector("#settings-btn");
+    const saveSettingsButton = document.querySelector("#save-settings");
+    const closeSettingsButton = document.querySelector("#close-settings");
+    const settingsModal = document.querySelector("#settings-modal");
 
-/* タイマー部分 */
-.main-timer {
-    font-size: 2em;
-    padding: 5px; /* 余白を縮小 */
-    border-radius: 10px;
-}
+    let currentPhase = "workout";
+    let timeLeft = workoutTime;
 
-#timer-display {
-    font-size: 3.5em; /* 文字サイズ調整 */
-    font-weight: bold;
-    margin: 5px 0; /* 上下の余白を減らす */
-}
+    function updateDisplay() {
+        if (timeLeft > 0) {
+            let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+            let seconds = String(timeLeft % 60).padStart(2, '0');
+            timerDisplay.textContent = `${minutes}:${seconds}`;
+        }
 
-/* ステータス表示 */
-.status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px; /* 間隔を縮小 */
-    font-size: 1.2em;
-    font-weight: bold;
-    margin: 5px auto; /* 余白を減らす */
-    padding: 8px;
-    background-color: #ddd;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
-}
+        let totalMinutes = String(Math.floor(totalRemainingTime / 60)).padStart(2, '0');
+        let totalSeconds = String(totalRemainingTime % 60).padStart(2, '0');
+        totalCountdown.textContent = `全体残り時間: ${totalMinutes}:${totalSeconds}`;
 
-.status-item {
-    flex: 1;
-    text-align: center;
-    padding: 5px; /* 余白を縮小 */
-    border-radius: 5px;
-    background: white;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-}
+        remainingRoundsDisplay.textContent = `ラウンド: ${remainingRounds}`;
+        remainingCyclesDisplay.textContent = `サイクル: ${remainingCycles}`;
+    }
 
-#total-countdown {
-    color: #ff4500;
-    font-size: 1.5em;
-    font-weight: bold;
-}
+    function startTimer() {
+        if (isRunning) return;
+        isRunning = true;
 
-/* ボタン */
-.controls button {
-    font-size: 1em;
-    margin: 5px;
-    padding: 8px 12px;
-    width: 110px; /* サイズ調整 */
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
+        updateDisplay(); // **即座に現在の時間を表示**
 
-.controls button:hover {
-    background-color: #0056b3;
-}
+        timer = setInterval(() => {
+            if (timeLeft === 1) { // **0秒の表示を防ぐ**
+                totalRemainingTime--;
+                switchPhase();
+            } else {
+                timeLeft--;
+                totalRemainingTime--;
+            }
+            updateDisplay();
+        }, 1000);
+    }
 
-/* 設定画面 */
-.modal {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 2px 2px 10px #aaa;
-    width: 280px;
-    text-align: left;
-}
+    function switchPhase() {
+        if (currentPhase === "workout") {
+            remainingRounds--;
 
-.settings-group {
-    margin: 8px 0;
-}
+            if (remainingRounds > 0) {
+                // 通常のラウンドの休憩に入る
+                currentPhase = "rest";
+                timeLeft = restTime;
+                phaseTitle.textContent = "休憩";
+                document.body.className = "rest";
+            } else {
+                // **サイクルの最後の休憩をスキップし、サイクル休憩へ移行**
+                remainingCycles--;
+                if (remainingCycles <= 0) {
+                    endWorkout(); // **すべて終了時に「終了」と表示**
+                    return;
+                }
+                remainingRounds = totalRounds;
+                currentPhase = "cycle-rest";
+                timeLeft = cycleRestTime;
+                phaseTitle.textContent = "サイクル休憩";
+                document.body.className = "cycle-rest";
+            }
+        } else {
+            // 休憩後はワークアウトへ
+            currentPhase = "workout";
+            timeLeft = workoutTime;
+            phaseTitle.textContent = "ワークアウト";
+            document.body.className = "workout";
+        }
+    }
 
-.settings-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 3px;
-}
+    function endWorkout() {
+        clearInterval(timer);
+        isRunning = false;
+        timeLeft = 0;
+        totalRemainingTime = 0;
+        phaseTitle.textContent = "終了";
+        timerDisplay.textContent = "00:00";
+        totalCountdown.textContent = "全体残り時間: 00:00";
+        document.body.className = "finished";
+    }
 
-.settings-group input {
-    width: 100%;
-    padding: 5px;
-    font-size: 1em;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
+    function resetTimer() {
+        clearInterval(timer);
+        isRunning = false;
+        remainingRounds = totalRounds;
+        remainingCycles = totalCycles;
+        timeLeft = workoutTime;
+        totalRemainingTime = (workoutTime * totalRounds + restTime * (totalRounds - 1)) * totalCycles + (totalCycles - 1) * cycleRestTime;
+        currentPhase = "workout";
+        phaseTitle.textContent = "ワークアウト";
+        document.body.className = "workout";
+        updateDisplay();
+    }
 
-.settings-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 8px;
-}
+    function applySettings() {
+        let workoutInput = document.querySelector("#workout-time").value.split(":");
+        let restInput = document.querySelector("#rest-time").value.split(":");
+        let cycleRestInput = document.querySelector("#cycle-rest-time").value.split(":");
 
-.settings-buttons button {
-    font-size: 0.9em;
-    padding: 6px;
-    width: 45%;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
+        workoutTime = parseInt(workoutInput[0]) * 60 + parseInt(workoutInput[1]);
+        restTime = parseInt(restInput[0]) * 60 + parseInt(restInput[1]);
+        cycleRestTime = parseInt(cycleRestInput[0]) * 60 + parseInt(cycleRestInput[1]);
+        totalRounds = parseInt(document.querySelector("#rounds").value);
+        totalCycles = parseInt(document.querySelector("#cycles").value);
 
-.settings-buttons button:hover {
-    background-color: #218838;
-}
+        resetTimer();
+    }
 
-#close-settings {
-    background-color: #dc3545;
-}
+    startButton.addEventListener("click", startTimer);
+    stopButton.addEventListener("click", () => { clearInterval(timer); isRunning = false; });
+    resetButton.addEventListener("click", resetTimer);
 
-#close-settings:hover {
-    background-color: #c82333;
-}
+    settingsButton.addEventListener("click", () => {
+        settingsModal.style.display = "block";
+    });
 
-/* 状態による背景色の変更 */
-body.workout {
-    background-color: #90ee90;
-}
+    closeSettingsButton.addEventListener("click", () => {
+        settingsModal.style.display = "none";
+    });
 
-body.rest {
-    background-color: #ff6666;
-}
+    saveSettingsButton.addEventListener("click", () => {
+        applySettings();
+        settingsModal.style.display = "none";
+    });
+
+    updateDisplay();
+});
 
 body.cycle-rest {
     background-color: #6699ff;
