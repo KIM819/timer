@@ -154,3 +154,43 @@ document.addEventListener("DOMContentLoaded", function () {
 body.cycle-rest {
     background-color: #6699ff;
 }
+window.onload = function () {
+    console.log("JavaScript がロードされました");
+
+    let startButton = document.querySelector("#start-btn");
+    let stopButton = document.querySelector("#stop-btn");
+    let resetButton = document.querySelector("#reset-btn");
+    let settingsButton = document.querySelector("#settings-btn");
+
+    if (startButton) {
+        startButton.addEventListener("click", function () {
+            console.log("スタートボタンが押されました");
+        });
+    } else {
+        console.error("start-btn が見つかりません");
+    }
+
+    if (stopButton) {
+        stopButton.addEventListener("click", function () {
+            console.log("ストップボタンが押されました");
+        });
+    } else {
+        console.error("stop-btn が見つかりません");
+    }
+
+    if (resetButton) {
+        resetButton.addEventListener("click", function () {
+            console.log("リセットボタンが押されました");
+        });
+    } else {
+        console.error("reset-btn が見つかりません");
+    }
+
+    if (settingsButton) {
+        settingsButton.addEventListener("click", function () {
+            console.log("設定ボタンが押されました");
+        });
+    } else {
+        console.error("settings-btn が見つかりません");
+    }
+};
