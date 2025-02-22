@@ -1,118 +1,185 @@
-/* script.js */
-function parseTime(timeStr) {
-    const [minutes, seconds] = timeStr.split(":" ).map(Number);
-    return minutes * 60 + seconds;
+/* 全体のレイアウト */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;
+    overflow: hidden; /* スクロール禁止 */
 }
 
-let workoutTime = parseTime(document.getElementById("workout-time").value);
-let restTime = parseTime(document.getElementById("rest-time").value);
-let cycleRestTime = parseTime(document.getElementById("cycle-rest-time").value);
-let roundsPerCycle = parseInt(document.getElementById("rounds-per-cycle").value);
-let cycleCount = parseInt(document.getElementById("cycles").value);
-
-let currentRound = 1;
-let currentCycle = 1;
-let isWorkout = true;
-let timer;
-let timeRemaining = workoutTime;
-
-const beep = new Audio('https://www.soundjay.com/button/beep-07.wav');
-
-const timeDisplay = document.getElementById("time-display");
-const roundDisplay = document.getElementById("round-display");
-const cycleDisplay = document.getElementById("cycle-display");
-const startButton = document.getElementById("start-button");
-const stopButton = document.getElementById("stop-button");
-const resetButton = document.getElementById("reset-button");
-const settingsButton = document.getElementById("settings-button");
-const overlay = document.getElementById("overlay");
-
-document.body.style.backgroundColor = "#9ACD32";
-
-timer = null;
-
-function startTimer() {
-    if (!timer) {
-        timer = setInterval(updateTimer, 1000);
-    }
+.container {
+    display: flex;
+    flex-direction: row;
+    width: 95%;
+    max-width: 1000px;
+    height: 95vh;
+    background: white;
+    padding: 5px; /* 余白を縮小 */
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px #aaa;
+    justify-content: space-between;
+    align-items: center;
 }
 
-function stopTimer() {
-    clearInterval(timer);
-    timer = null;
+/* 左パネル（タイマー表示） */
+.left-panel {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 }
 
-function resetTimer() {
-    stopTimer();
-    currentRound = 1;
-    currentCycle = 1;
-    isWorkout = true;
-    timeRemaining = workoutTime;
-    document.body.style.backgroundColor = "#9ACD32";
-    updateDisplay();
+/* 右パネル（ボタン） */
+.right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 }
 
-function updateTimer() {
-    if (timeRemaining > 1) {
-        timeRemaining--;
-    } else {
-        beep.play();
-        if (isWorkout) {
-            if (currentRound < roundsPerCycle) {
-                isWorkout = false;
-                timeRemaining = restTime;
-                document.body.style.backgroundColor = "#FF6347";
-            } else {
-                if (currentCycle < cycleCount) {
-                    currentCycle++;
-                    currentRound = 1;
-                    timeRemaining = cycleRestTime;
-                    isWorkout = false;
-                    document.body.style.backgroundColor = "#FF6347";
-                } else {
-                    resetTimer();
-                    return;
-                }
-            }
-        } else {
-            isWorkout = true;
-            currentRound++;
-            timeRemaining = workoutTime;
-            document.body.style.backgroundColor = "#9ACD32";
-        }
-        beep.play();
-    }
-    updateDisplay();
+/* タイマー部分 */
+.main-timer {
+    font-size: 2em;
+    padding: 5px; /* 余白を縮小 */
+    border-radius: 10px;
 }
 
-function updateDisplay() {
-    timeDisplay.textContent = formatTime(timeRemaining);
-    roundDisplay.textContent = `ラウンド: ${currentRound}/${roundsPerCycle}`;
-    cycleDisplay.textContent = `サイクル: ${currentCycle}/${cycleCount}`;
+#timer-display {
+    font-size: 3.5em; /* 文字サイズ調整 */
+    font-weight: bold;
+    margin: 5px 0; /* 上下の余白を減らす */
 }
 
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+/* ステータス表示 */
+.status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px; /* 間隔を縮小 */
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 5px auto; /* 余白を減らす */
+    padding: 8px;
+    background-color: #ddd;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
 }
 
-settingsButton.addEventListener("click", () => {
-    overlay.style.display = "block";
-});
+.status-item {
+    flex: 1;
+    text-align: center;
+    padding: 5px; /* 余白を縮小 */
+    border-radius: 5px;
+    background: white;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
 
-document.getElementById("save-settings").addEventListener("click", () => {
-    workoutTime = parseTime(document.getElementById("workout-time").value);
-    restTime = parseTime(document.getElementById("rest-time").value);
-    cycleRestTime = parseTime(document.getElementById("cycle-rest-time").value);
-    roundsPerCycle = parseInt(document.getElementById("rounds-per-cycle").value);
-    cycleCount = parseInt(document.getElementById("cycles").value);
-    resetTimer();
-    overlay.style.display = "none";
-});
+#total-countdown {
+    color: #ff4500;
+    font-size: 1.5em;
+    font-weight: bold;
+}
 
-startButton.addEventListener("click", startTimer);
-stopButton.addEventListener("click", stopTimer);
-resetButton.addEventListener("click", resetTimer);
+/* ボタン */
+.controls button {
+    font-size: 1em;
+    margin: 5px;
+    padding: 8px 12px;
+    width: 110px; /* サイズ調整 */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
 
-updateDisplay();
+.controls button:hover {
+    background-color: #0056b3;
+}
+
+/* 設定画面 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px #aaa;
+    width: 280px;
+    text-align: left;
+}
+
+.settings-group {
+    margin: 8px 0;
+}
+
+.settings-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.settings-group input {
+    width: 100%;
+    padding: 5px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.settings-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.settings-buttons button {
+    font-size: 0.9em;
+    padding: 6px;
+    width: 45%;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.settings-buttons button:hover {
+    background-color: #218838;
+}
+
+#close-settings {
+    background-color: #dc3545;
+}
+
+#close-settings:hover {
+    background-color: #c82333;
+}
+
+/* 状態による背景色の変更 */
+body.workout {
+    background-color: #90ee90;
+}
+
+body.rest {
+    background-color: #ff6666;
+}
+
+body.cycle-rest {
+    background-color: #6699ff;
+}
