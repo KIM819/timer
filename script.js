@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let restTime = 300; // 初期休憩時間（秒）
     let cycleRestTime = 1800; // 初期サイクル間休憩時間（秒）
     let totalRounds = 4; // 1サイクルのラウンド数
-    let totalCycles = 3; // 総サイクル数
+    let totalCycles = 2; // 総サイクル数
 
     let remainingRounds = totalRounds;
     let remainingCycles = totalCycles;
