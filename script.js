@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
     remainingRoundsDisplay.textContent = `ラウンド: ${remainingRounds}`;
     remainingCyclesDisplay.textContent = `サイクル: ${remainingCycles}`;
 }
-
+const alertSound = new Audio("./sounds/alert.mp3");
 
     function startTimer() {
         if (isRunning) return;
@@ -54,6 +54,9 @@ document.addEventListener("DOMContentLoaded", function () {
         updateDisplay(); // **即座に現在の時間を表示**
 
         timer = setInterval(() => {
+             if (timeLeft === 4) { // **次の秒で 3秒になるため、4秒の時点で再生**
+            alertSound.play().catch(error => console.log("音声の再生がブロックされました: ", error));
+        }
             if (timeLeft === 1) { // **0秒の表示を防ぐ**
                 totalRemainingTime--;
                 switchPhase();
