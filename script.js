@@ -29,19 +29,23 @@ document.addEventListener("DOMContentLoaded", function () {
     let timeLeft = workoutTime;
 
     function updateDisplay() {
-        if (timeLeft > 0) {
-            let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-            let seconds = String(timeLeft % 60).padStart(2, '0');
-            timerDisplay.textContent = `${minutes}:${seconds}`;
-        }
-
-        let totalMinutes = String(Math.floor(totalRemainingTime / 60)).padStart(2, '0');
-        let totalSeconds = String(totalRemainingTime % 60).padStart(2, '0');
-        totalCountdown.textContent = `全体残り時間: ${totalMinutes}:${totalSeconds}`;
-
-        remainingRoundsDisplay.textContent = `ラウンド: ${remainingRounds}`;
-        remainingCyclesDisplay.textContent = `サイクル: ${remainingCycles}`;
+    if (timeLeft > 0) {
+        let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        let seconds = String(timeLeft % 60).padStart(2, '0');
+        timerDisplay.textContent = `${minutes}:${seconds}`;
     }
+
+    // 全体の残り時間を hh:mm:ss に変換
+    let hours = String(Math.floor(totalRemainingTime / 3600)).padStart(2, '0');
+    let totalMinutes = String(Math.floor((totalRemainingTime % 3600) / 60)).padStart(2, '0');
+    let totalSeconds = String(totalRemainingTime % 60).padStart(2, '0');
+
+    totalCountdown.textContent = `全体残り時間: ${hours}:${totalMinutes}:${totalSeconds}`;
+
+    remainingRoundsDisplay.textContent = `ラウンド: ${remainingRounds}`;
+    remainingCyclesDisplay.textContent = `サイクル: ${remainingCycles}`;
+}
+
 
     function startTimer() {
         if (isRunning) return;
