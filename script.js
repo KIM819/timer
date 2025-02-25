@@ -46,6 +46,9 @@ document.addEventListener("DOMContentLoaded", function () {
     remainingCyclesDisplay.textContent = `サイクル: ${remainingCycles}`;
 }
 const alertSound = new Audio("./sounds/alert.mp3");
+document.getElementById("start-btn").addEventListener("click", function () {
+    alertSound.play().catch(() => console.log("初回の再生はブロックされました"));
+});
 
     function startTimer() {
         if (isRunning) return;
